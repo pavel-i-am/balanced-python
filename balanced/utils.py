@@ -25,9 +25,9 @@ def iter_multi_items(mapping):
     """
     # do this hack to avoid importing MultiDict from werkzeug
     # -- mahmoud
-    if hasattr(mapping, 'iteritems'):
+    if hasattr(mapping, 'items'):
         try:
-            argspec = inspect.getargspec(mapping.iteritems)
+            argspec = inspect.getargspec(mapping.items)
         except TypeError:
             if isinstance(mapping, dict):
                 for key, value in mapping.items():
@@ -38,7 +38,7 @@ def iter_multi_items(mapping):
                         yield key, value
         else:
             if 'multi' in argspec.args:
-                for item in mapping.iteritems(multi=True):
+                for item in mapping.items(multi=True):
                     yield item
     else:
         for item in mapping:
@@ -72,6 +72,7 @@ def _quote(s, safe='/', _join=''.join):
 
 
 def _quote_plus(s, safe=''):
+    s = s.decode('utf-8')
     if ' ' in s:
         return _quote(s, safe + ' ').replace(' ', '+')
     return _quote(s, safe)
