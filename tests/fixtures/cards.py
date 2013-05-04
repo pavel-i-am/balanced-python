@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 AUTH_INVALID_CARD = '4444444444444448'
 
 VERIFY_FAILED_CARD_NUMBER = '4222222222222220'
@@ -67,7 +64,7 @@ CARD = {
     'card_number': '4444424444444440',
     'expiration_month': 12,
     'expiration_year': 2013,
-    }
+}
 
 
 CARD_NO_ADDRESS = {
@@ -75,4 +72,4 @@ CARD_NO_ADDRESS = {
     'card_number': '4444424444444440',
     'expiration_month': 12,
     'expiration_year': 2013,
-    }
+}

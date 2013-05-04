@@ -1,7 +1,6 @@
-from __future__ import unicode_literals
 import datetime
-import unittest2 as unittest
-import urlparse
+import unittest
+import urllib.parse
 import warnings
 import mock
 
@@ -41,7 +40,7 @@ class TestResourceConstruction(WSGIServerTest):
             self.assertEqual(
                 exception.response.headers['location'],
                 '/v1/your-mom'
-                )
+            )
 
 
 class TestPage(unittest.TestCase):
@@ -62,25 +61,26 @@ class TestPage(unittest.TestCase):
         query = query.filter(balanced.Marketplace.f.f.endswith('lo'))
         query = query.filter(g=12)
 
-        parsed_uri = urlparse.urlparse(query.uri)
-        parsed_qs = urlparse.parse_qsl(parsed_uri.query)
+        parsed_uri = urllib.parse.urlparse(query.uri)
+        parsed_qs = urllib.parse.parse_qsl(parsed_uri.query)
 
         self.assertDictEqual(
             dict(parsed_qs),
-            {'a': 'b',
-             'a[!=]': '101',
-             'b[<=]': '5',
-             'b[<]': '4',
-             'c[>=]': '44',
-             'c[>]': '123',
-             'd[!in]': '6,33,55',
-             'd[in]': '1,2,3',
-             'e[!contains]': 'soda',
-             'e[contains]': 'it',
-             'f[endswith]': 'lo',
-             'f[startswith]': 'la',
-             'g': '12',
-         })
+            {
+                'a': 'b',
+                'a[!=]': '101',
+                'b[<=]': '5',
+                'b[<]': '4',
+                'c[>=]': '44',
+                'c[>]': '123',
+                'd[!in]': '6,33,55',
+                'd[in]': '1,2,3',
+                'e[!contains]': 'soda',
+                'e[contains]': 'it',
+                'f[endswith]': 'lo',
+                'f[startswith]': 'la',
+                'g': '12',
+            })
 
     def test_sort(self):
         q = balanced.Marketplace.query
@@ -109,7 +109,7 @@ class TestMarketplace(unittest.TestCase):
             self.assertEqual(len(w), 1)
             warning_ = w[0]
         self.assertEqual(
-            warning_.message.message,
+            str(warning_.message),
             ('The region parameter will be deprecated in the '
              'next minor version of balanced-python')
         )

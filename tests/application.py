@@ -2,12 +2,12 @@ import json
 
 import bottle
 
-import _responses
+from . import _responses
 
 
 SERIALIZERS = {
     'application/json': json.dumps,
-    }
+}
 
 
 app = bottle.Bottle()

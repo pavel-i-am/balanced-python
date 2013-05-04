@@ -30,7 +30,7 @@ def iter_multi_items(mapping):
             argspec = inspect.getargspec(mapping.iteritems)
         except TypeError:
             if isinstance(mapping, dict):
-                for key, value in mapping.iteritems():
+                for key, value in mapping.items():
                     if isinstance(value, (tuple, list)):
                         for value in value:
                             yield key, value
@@ -50,11 +50,11 @@ _always_safe = ('ABCDEFGHIJKLMNOPQRSTUVWXYZ'
                 'abcdefghijklmnopqrstuvwxyz'
                 '0123456789_.-')
 _safe_map = dict((c, c) for c in _always_safe)
-for i in xrange(0x80):
+for i in range(0x80):
     c = chr(i)
     if c not in _safe_map:
         _safe_map[c] = '%%%02X' % i
-_safe_map.update((chr(i), '%%%02X' % i) for i in xrange(0x80, 0x100))
+_safe_map.update((chr(i), '%%%02X' % i) for i in range(0x80, 0x100))
 _safemaps = {}
 
 
@@ -68,7 +68,7 @@ def _quote(s, safe='/', _join=''.join):
         safe_map = _safe_map.copy()
         safe_map.update([(c, c) for c in safe])
         _safemaps[safe] = quoter = safe_map.__getitem__
-    return _join(map(quoter, s))
+    return _join(list(map(quoter, s)))
 
 
 def _quote_plus(s, safe=''):
@@ -105,11 +105,11 @@ def url_encode(obj, charset='utf-8', encode_keys=False, sort=False, key=None,
     for key, value in iterable:
         if value is None:
             continue
-        if encode_keys and isinstance(key, unicode):
+        if encode_keys and isinstance(key, str):
             key = key.encode(charset)
         else:
             key = str(key)
-        if isinstance(value, unicode):
+        if isinstance(value, str):
             value = value.encode(charset)
         else:
             value = str(value)
@@ -263,4 +263,4 @@ def to_json(*args, **kwargs):
 
 
 def urljoin(*args):
-    return '/'.join(map(lambda x: str(x).strip('/'), args))
+    return '/'.join([str(x).strip('/') for x in args])
