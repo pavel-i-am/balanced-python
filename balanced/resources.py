@@ -3,8 +3,8 @@ import itertools
 import logging
 import urllib.parse
 import warnings
+import dateutil.parser
 
-import iso8601
 
 from balanced.utils import cached_property, url_encode, classproperty
 from balanced.exc import NoResultFound, MultipleResultsFound, ResourceError
@@ -383,7 +383,7 @@ def make_constructors():
 
     """
 
-    def the_new(cls, **kwargs):
+    def the_new(self, **kwargs):
         for key in kwargs.keys():
 
             if not is_uri(key):
@@ -391,15 +391,26 @@ def make_constructors():
 
             new_key = key.replace('_uri', '')
 
-            if hasattr(cls, new_key):
+            if hasattr(self, new_key):
                 continue
 
-            setattr(cls, new_key, _LazyURIDescriptor(key))
+            setattr(self, new_key, _LazyURIDescriptor(key))
 
-        return object.__new__(cls, **kwargs)
+        return object.__new__(self, **kwargs)
 
     def the_init(self, **kwargs):
         self.id = None
+        for key in kwargs.keys():
+
+            if not is_uri(key):
+                continue
+
+            new_key = key.replace('_uri', '')
+
+            if hasattr(self, new_key):
+                continue
+
+            setattr(self, new_key, _LazyURIDescriptor(key))
 
         # iterate through the schema that comes back
         for key, value in kwargs.items():
@@ -419,13 +430,13 @@ def make_constructors():
                     else:
                         value = resource(**value)
             elif key.endswith('_at') and is_date(value):
-                value = iso8601.parse_date(value)
+                value = dateutil.parser.parse(value)
             setattr(self, key, value)
 
         if not hasattr(self, 'uri'):
             self.uri = uri_discovery(self)
 
-    return the_init, the_new
+    return the_init#, the_new
 
 
 class _ResourceField(object):
@@ -508,7 +519,7 @@ def resource_base(singular=None,
     class Base(type):
 
         def __new__(mcs, classname, bases, clsdict):
-            the_init, the_new = make_constructors()
+            the_init = make_constructors()
 
             fields = _ResourceFields()
             clsdict.update({
@@ -519,7 +530,7 @@ def resource_base(singular=None,
                     'nested_under': nested_under,
                 },
                 '__init__': the_init,
-                '__new__': the_new,
+                # '__new__': the_new,
                 'fields': fields,
                 'f': fields,
             })
