@@ -436,7 +436,7 @@ def make_constructors():
         if not hasattr(self, 'uri'):
             self.uri = uri_discovery(self)
 
-    return the_init#, the_new
+    return the_init, the_new
 
 
 class _ResourceField(object):
@@ -516,10 +516,23 @@ def resource_base(singular=None,
                   resides_under_marketplace=True,
                   nested_under=None):
 
+    def the_ne(self, **kwargs):
+        for key in kwargs.keys():
+
+            if not is_uri(key):
+                continue
+
+            new_key = key.replace('_uri', '')
+
+            if hasattr(self, new_key):
+                continue
+            setattr(self, new_key, _LazyURIDescriptor(key))
+        return object.__new__(self)
+
     class Base(type):
 
         def __new__(mcs, classname, bases, clsdict):
-            the_init = make_constructors()
+            the_init, the_new = make_constructors()
 
             fields = _ResourceFields()
             clsdict.update({
@@ -530,7 +543,7 @@ def resource_base(singular=None,
                     'nested_under': nested_under,
                 },
                 '__init__': the_init,
-                # '__new__': the_new,
+                '__new__': the_ne,
                 'fields': fields,
                 'f': fields,
             })

@@ -22,7 +22,7 @@ class TestResourceConstruction(WSGIServerTest):
             txns = [
                 t for t in balanced.Transaction.query
                 if 'TEST-MP778-071-6386/debits/W985-622-9570' in t.uri]
-            self.assertEqual(txns[0].account_uri, txns[0].account.uri)
+            self.assertEqual(txns[0].account_uri, txns[1].account.uri)
 
     def test_implicit_conversion_to_datetime(self):
         with self.start_server(app):
